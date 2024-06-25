@@ -57,4 +57,30 @@ class Controller:
         self._view.txtResult2.controls.append(ft.Text(f"Nodo di grado max: {elem[0]} con grado: {elem[1]}"))
         self._view.update_page()
     def handleDreamTeam(self, e):
-        pass
+        if self.anno=="":
+            self._view.create_alert("Anno non inserito")
+            self._view.update_page()
+            return
+        if self.salario=="":
+            self._view.create_alert("Anno non inserito")
+            self._view.update_page()
+            return
+
+        try:
+            intAnno = int(self.anno)
+        except ValueError:
+            self._view.create_alert("Anno inserito non numerico")
+            self._view.update_page()
+            return
+
+        try:
+            intSalario = (int(self.salario))*10**6
+        except ValueError:
+            self._view.create_alert("Salario inserito non numerico")
+            self._view.update_page()
+            return
+
+        solBest, salarioMax = self._model.calcolaDreamTeam(intAnno, intSalario)
+        for i in solBest:
+            self._view.txtResult2.controls.append(ft.Text(f"{i}"))
+        self._view.update_page()

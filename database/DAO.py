@@ -58,3 +58,27 @@ class DAO():
         conn.close()
         return result
 
+    @staticmethod
+    def getSquadreGiocatore(n, anno):
+        conn = DBConnect.get_connection()
+
+        result = {}
+
+        cursor = conn.cursor(dictionary=True)
+        query = """select  distinctrow a.playerID, a.teamID 
+                    from lahmansbaseballdb.appearances a
+                    where a.`year` = %s
+                    and a.playerID = %s"""
+
+        cursor.execute(query, (anno, n))
+
+        for row in cursor:
+            if row["playerID"] not in result:
+                result[row["playerID"]] = [row["teamID"]]
+            else:
+                result[row["playerID"]].append(row["teamID"])
+
+        cursor.close()
+        conn.close()
+        return result
+

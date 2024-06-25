@@ -36,7 +36,7 @@ class View(ft.UserControl):
         #row 2
         self.btnConnesse = ft.ElevatedButton(text="Calcola connesse", on_click=self._controller.handleCalcolaConnesse)
         self.btnGradoMassimo = ft.ElevatedButton(text="Grado massimo", on_click=self._controller.handleGradoMassimo)
-        self.btnDreamTeam = ft.ElevatedButton(text="Calcola connesse", on_click=self._controller.handleDreamTeam)
+        self.btnDreamTeam = ft.ElevatedButton(text="Dream Team", on_click=self._controller.handleDreamTeam)
         row2 = ft.Row([ft.Container(self.btnConnesse, width=200),
                        ft.Container(self.btnGradoMassimo, width=200),
                        ft.Container(self.btnDreamTeam, width=200)],

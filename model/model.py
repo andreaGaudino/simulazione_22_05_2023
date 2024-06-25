@@ -33,5 +33,69 @@ class Model:
         lista.sort(key=lambda x: x[1], reverse=True)
         return lista[0]
 
+
+    def calcolaDreamTeam(self, anno, salario):
+        self.solBest = []
+        self.salarioMax = 0
+
+        for n in list(self.graph.nodes):
+            parziale = []
+            if len(list(self.graph.neighbors(n)))>0:
+                parziale.append(n)
+                squadre = self.trovaSquadre(n.id, anno)
+                self.ricorsione(parziale, n, anno, salario, squadre)
+        print(self.solBest)
+        return self.solBest, self.salarioMax
+    def ricorsione(self, parziale, nodo, anno, salario, squadrePresenti):
+        nodi = list(self.graph.nodes)
+        nodiAmmissibili = self.getAmmissibili(nodi, squadrePresenti, anno, parziale)
+        if len(nodiAmmissibili) == 0:
+            if len(parziale) == 1:
+                return
+            totSalari = self.getTotSalari(parziale)
+            if totSalari>self.salarioMax:
+                print(parziale)
+                self.salarioMax = totSalari
+                self.solBest = copy.deepcopy(parziale)
+        else:
+            for v in nodiAmmissibili:
+                parziale.append(v)
+                squadre = self.trovaSquadre(v.id, anno)
+                s = copy.deepcopy(squadrePresenti)
+                for i in squadre:
+                    s.append(i)
+                self.ricorsione(parziale, v, anno, salario, s)
+                parziale.pop()
+
+    def trovaSquadre(self, nodo, anno):
+        dizio = DAO.getSquadreGiocatore(nodo, anno)
+        if len(dizio) == 0:
+            return []
+        return dizio[nodo]
+
+
+    def getTotSalari(self, parziale):
+        tot = 0
+        for i in parziale:
+            tot += i.salary
+        return tot
+
+    def getAmmissibili(self, vicini, squadrePresenti, anno, parziale):
+        ammisibili = []
+        s = copy.deepcopy(squadrePresenti)
+        for v in vicini:
+            if v not in parziale:
+                boolean = False
+                squadre = self.trovaSquadre(v.id, anno)
+                for i in squadre:
+                    if i in s:
+                        boolean = True
+                if not boolean:
+                    ammisibili.append(v)
+                    for i in squadre:
+                        if i not in s:
+                            s.append(i)
+        return ammisibili
+
     def graphDetails(self):
         return len(self.graph.nodes), len(self.graph.edges)
