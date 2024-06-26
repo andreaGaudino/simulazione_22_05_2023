@@ -82,5 +82,5 @@ class Controller:
 
         solBest, salarioMax = self._model.calcolaDreamTeam(intAnno, intSalario)
         for i in solBest:
-            self._view.txtResult2.controls.append(ft.Text(f"{i}"))
+            self._view.txtResult2.controls.append(ft.Text(f"{i} con salario: {i.salary}"))
         self._view.update_page()

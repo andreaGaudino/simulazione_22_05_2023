@@ -42,30 +42,34 @@ class Model:
             parziale = []
             if len(list(self.graph.neighbors(n)))>0:
                 parziale.append(n)
-                squadre = self.trovaSquadre(n.id, anno)
-                self.ricorsione(parziale, n, anno, salario, squadre)
+                #squadre = self.trovaSquadre(n.id, anno)
+                self.ricorsione(parziale, n)
+        #self.ricorsione([self.idMap['glavito02']], self.idMap['glavito02'])
         print(self.solBest)
         return self.solBest, self.salarioMax
-    def ricorsione(self, parziale, nodo, anno, salario, squadrePresenti):
-        nodi = list(self.graph.nodes)
-        nodiAmmissibili = self.getAmmissibili(nodi, squadrePresenti, anno, parziale)
+    def ricorsione(self, parziale, nodo):
+        vicini = list(self.graph.nodes)
+        nodiAmmissibili = self.getAmmissibili(vicini, nodo, parziale)
         if len(nodiAmmissibili) == 0:
             if len(parziale) == 1:
                 return
             totSalari = self.getTotSalari(parziale)
+
             if totSalari>self.salarioMax:
-                print(parziale)
+                print(totSalari, parziale)
                 self.salarioMax = totSalari
                 self.solBest = copy.deepcopy(parziale)
+                return
         else:
             for v in nodiAmmissibili:
-                parziale.append(v)
-                squadre = self.trovaSquadre(v.id, anno)
-                s = copy.deepcopy(squadrePresenti)
-                for i in squadre:
-                    s.append(i)
-                self.ricorsione(parziale, v, anno, salario, s)
-                parziale.pop()
+                boolean = True
+                for p in parziale:
+                    if self.graph.has_edge(v, p):
+                        boolean = False
+                if boolean:
+                    parziale.append(v)
+                    self.ricorsione(parziale, v)
+                    parziale.pop()
 
     def trovaSquadre(self, nodo, anno):
         dizio = DAO.getSquadreGiocatore(nodo, anno)
@@ -80,22 +84,15 @@ class Model:
             tot += i.salary
         return tot
 
-    def getAmmissibili(self, vicini, squadrePresenti, anno, parziale):
-        ammisibili = []
-        s = copy.deepcopy(squadrePresenti)
-        for v in vicini:
-            if v not in parziale:
-                boolean = False
-                squadre = self.trovaSquadre(v.id, anno)
-                for i in squadre:
-                    if i in s:
-                        boolean = True
-                if not boolean:
-                    ammisibili.append(v)
-                    for i in squadre:
-                        if i not in s:
-                            s.append(i)
-        return ammisibili
+    def getAmmissibili(self, vicini, nodo, parziale):
+        ammissibili = copy.deepcopy(vicini)
+        for v in parziale:
+            ammissibili.remove(v)
+            succ = self.graph.neighbors(v)
+            for a in succ:
+                ammissibili.remove(a)
+
+        return ammissibili
 
     def graphDetails(self):
         return len(self.graph.nodes), len(self.graph.edges)
